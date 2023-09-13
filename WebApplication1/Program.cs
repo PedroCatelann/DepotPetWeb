@@ -1,5 +1,7 @@
 
+using FluentAssertions.Common;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Context;
 
@@ -10,6 +12,13 @@ builder.Services.AddControllersWithViews(x => x.SuppressAsyncSuffixInActionNames
 
 builder.Services.AddDbContext<AppDbContext>(op => op.UseSqlServer("Data Source=localhost;Initial Catalog=depotpetweb_db;Integrated Security=True;TrustServerCertificate=true"));
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+{
+    options.LoginPath = "/User/Login"; // Página de login
+    options.AccessDeniedPath = ""; // Página de acesso negado
+});
+
+builder.Services.AddHealthChecks();
 
 
 var app = builder.Build();
@@ -21,7 +30,10 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+var cookiePolicyOptions = new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.Strict,
+};
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -29,8 +41,16 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthentication();;
-
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+
+   endpoints.MapControllers();
+
+});
+
+app.UseCookiePolicy(cookiePolicyOptions);
 
 app.MapControllerRoute(
     name: "default",
