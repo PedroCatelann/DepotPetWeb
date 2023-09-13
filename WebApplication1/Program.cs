@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews(x => x.SuppressAsyncSuffixInActionNames = false).AddRazorRuntimeCompilation();
 
-builder.Services.AddDbContext<AppDbContext>(op => op.UseSqlServer("Data Source=localhost;Initial Catalog=depotpetweb_db;Integrated Security=True"));
+builder.Services.AddDbContext<AppDbContext>(op => op.UseSqlServer("Data Source=localhost;Initial Catalog=depotpetweb_db;Integrated Security=True;TrustServerCertificate=true"));
 
 var app = builder.Build();
 
